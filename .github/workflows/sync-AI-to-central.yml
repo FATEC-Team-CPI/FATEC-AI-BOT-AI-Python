@@ -1,0 +1,66 @@
+name: Sync AI To Central
+
+on:
+  push:
+    branches: [ "develop" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CENTRAL_REPO: FATEC-Team-CPI/FATEC-PI-2026-FATEC-AI-BOT
+  TARGET_BRANCH: develop
+
+jobs:
+  sync-AI:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: sync-AI-central
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout AI repo
+        uses: actions/checkout@v4
+
+      - name: Checkout central repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CENTRAL_REPO }}
+          token: ${{ secrets.CENTRAL_REPO_TOKEN }}
+          path: central
+          ref: ${{ env.TARGET_BRANCH }}
+
+      - name: Sync files to AI folder
+        run: |
+          mkdir -p central/AI
+          rsync -a --delete \
+            --exclude ".git" \
+            --exclude ".github" \
+            ./ central/AI/
+
+      - name: Commit and push changes
+        env:
+          ACTOR: ${{ github.actor }}
+          SOURCE_REPO: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_REF: ${{ github.ref_name }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          cd central
+          git config user.name "${ACTOR}"
+          git config user.email "${ACTOR}@users.noreply.github.com"
+
+          git add AI
+          if git diff --cached --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+
+          git commit -m "chore(sync): AI from ${SOURCE_REPO}@${SOURCE_SHA}
+
+          source_ref: ${SOURCE_REF}
+          triggered_by: ${ACTOR}
+          workflow_run: https://github.com/${SOURCE_REPO}/actions/runs/${RUN_ID}"
+
+          git push origin "${{ env.TARGET_BRANCH }}"
