@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout AI repo
         uses: actions/checkout@v4
+        with:
+          path: source
 
       - name: Checkout central repo
         uses: actions/checkout@v4
@@ -37,7 +39,7 @@ jobs:
           rsync -a --delete \
             --exclude ".git" \
             --exclude ".github" \
-            ./ central/AI/
+            source/ central/AI/
 
       - name: Commit and push changes
         env:
@@ -50,17 +52,13 @@ jobs:
           cd central
           git config user.name "${ACTOR}"
           git config user.email "${ACTOR}@users.noreply.github.com"
-
           git add AI
           if git diff --cached --quiet; then
             echo "No changes."
             exit 0
           fi
-
           git commit -m "chore(sync): AI from ${SOURCE_REPO}@${SOURCE_SHA}
-
           source_ref: ${SOURCE_REF}
           triggered_by: ${ACTOR}
           workflow_run: https://github.com/${SOURCE_REPO}/actions/runs/${RUN_ID}"
-
           git push origin "${{ env.TARGET_BRANCH }}"
