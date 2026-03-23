@@ -1,0 +1,17 @@
+# .github/workflows/enforce-pr-from-develop.yml
+name: Enforce PR from develop
+
+on:
+  pull_request:
+    branches:
+      - main  # ← só dispara quando o destino for main
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch
+        if: github.head_ref != 'develop'
+        run: |
+          echo "PRs para main só são permitidos a partir da branch develop."
+          exit 1
