@@ -1,0 +1,30 @@
+from fastapi import FastAPI, UploadFile, File
+import boto3
+
+app = FastAPI()
+
+s3 = boto3.client(
+    "s3",
+    endpoint_url="http://localhost:4566",
+    aws_access_key_id="test",
+    aws_secret_access_key="test",
+    region_name="us-east-1"
+)
+
+BUCKET_NAME = "meu-bucket"
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+
+    content = await file.read()
+
+    s3.put_object(
+        Bucket=BUCKET_NAME,
+        Key=file.filename,
+        Body=content
+    )
+
+    return {
+        "message": "Arquivo enviado para S3",
+        "filename": file.filename
+    }
