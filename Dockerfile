@@ -1,19 +1,15 @@
 # 1. Define a imagem base
-FROM python:3.11-slim
+FROM quay.io/docling-project/docling-serve-cpu:latest
 
 # 2. Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
 
 # 3. Copia requirements primeiro (para cache do Docker)
 COPY requirements.txt .
-RUN chmod +x /usr/local/bin/entrypoint.sh
+#RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # 4. Instala as dependências do projeto de forma leve
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && pip install --no-cache-dir -r requirements.txt \
-    && apt-get purge -y --auto-remove build-essential \
-    && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 5. Copia o restante do código
 COPY src/ .
