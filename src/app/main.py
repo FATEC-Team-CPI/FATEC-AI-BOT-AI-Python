@@ -12,8 +12,12 @@ app = FastAPI(title="IABotAgent FATEC API")
 def home():
     return {"status": "ok"}
 
+@app.get("/teste")
+async def teste(file: UploadFile):
+    return {"status": file.suffix}
+
 @app.get("/upload-documentos")
-async def upload(file: UploadFile = File(...)):
+async def upload(file: UploadFile):
 
     try:
         content = read_file(file)

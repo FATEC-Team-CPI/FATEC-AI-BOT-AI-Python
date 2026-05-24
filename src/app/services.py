@@ -4,14 +4,15 @@ from docling.document_converter import DocumentConverter
 from pathlib import Path
 import os
 
-async def read_file(file: UploadFile = File(...)):
+
+async def read_file(file: UploadFile):
     
     allowTypeDocument = [".pdf",".txt"]
 
     try:
         content = await file.read()
 
-        if(content.suffix not in allowTypeDocument):
+        if(file.suffix not in allowTypeDocument):
             return{
                 "message": "Erro ao ler arquivo, o formato do arquivo não é compatível.",
             }
