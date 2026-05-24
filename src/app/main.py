@@ -8,7 +8,6 @@ from services import read_file, docling_convert, save_localstack
 app = FastAPI(title="IABotAgent FATEC API")
 
 
-
 @app.get("/")
 def home():
     return {"status": "ok"}
