@@ -6,6 +6,7 @@ WORKDIR /app
 
 # 3. Copia requirements primeiro (para cache do Docker)
 COPY requirements.txt .
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # 4. Instala as dependências do projeto de forma leve
 RUN apt-get update && apt-get install -y --no-install-recommends \

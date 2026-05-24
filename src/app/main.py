@@ -14,7 +14,7 @@ def home():
 
 @app.post("/teste")
 async def teste(file: UploadFile = File(...)):
-    return {"status": file.suffix}
+    return {"message": file.suffix}
 
 @app.post("/upload-documentos")
 async def upload(file: UploadFile = File(...)):
