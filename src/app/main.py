@@ -1,9 +1,9 @@
 
 from fastapi import FastAPI, UploadFile, File
-from config import s3,BUCKET_NAME
+from app.config import s3, BUCKET_NAME
 from docling.document_converter import DocumentConverter
 from pathlib import Path
-from services import read_file, docling_convert, save_localstack
+from app.services import read_file, docling_convert, save_localstack
 
 app = FastAPI(title="IABotAgent FATEC API")
 

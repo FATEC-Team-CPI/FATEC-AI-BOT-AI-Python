@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # 5. Copia o restante do código
-COPY . .
+COPY src/ .
 
 # 6. Define variáveis de ambiente
 ENV PYTHONUNBUFFERED=1

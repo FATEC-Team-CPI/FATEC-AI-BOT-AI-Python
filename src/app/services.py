@@ -1,5 +1,5 @@
 from fastapi import UploadFile, File
-from config import s3,BUCKET_NAME
+from app.config import s3, BUCKET_NAME
 from docling.document_converter import DocumentConverter
 from pathlib import Path
 import os
