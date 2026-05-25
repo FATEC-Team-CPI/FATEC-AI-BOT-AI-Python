@@ -2,6 +2,16 @@ from fastapi import UploadFile, File
 from app.config import s3, BUCKET_NAME
 from docling.document_converter import DocumentConverter
 from pathlib import Path
+import io
+import boto3
+
+s3 = boto3.client(
+    "s3",
+    endpoint_url="http://localhost:4566",  
+    aws_access_key_id="test",
+    aws_secret_access_key="test",
+    region_name="us-east-1"
+)
 
 
 async def read_file(file: UploadFile):
@@ -22,38 +32,41 @@ async def read_file(file: UploadFile):
         return False
         
     
-
-
-def docling_convert(content):
-
+def docling_convert(file):
     try:
         converter = DocumentConverter()
-        doc = converter.convert(content).document
+        filename = (str(file.filename)).replace(" ", "_").lower()
+        doc = converter.convert(file).document
+        
+        conteudo = doc.export_to_markdown()
+        file_md = io.BytesIO(conteudo.encode("utf-8"))
+        
+        
+        return file_md, filename
+    except Exception as e:
+        print(e)
+        return None, None
+        
+        
+def printa(file_md: io.BytesIO):
+    file_md.seek(0)
+    print(file_md.read().decode("utf-8"))
 
-        Path("documento.md").write_text(doc.export_to_markdown())
 
-        filename = (str(content.filename)).replace(" ","").lower()
-
-        with open(filename, 'w',encoding="utf-8") as doc:
-            doc.write(doc.export_to_markdown())
-
-        return doc, filename
-    
-    except:
-        return{
-            "message": "Erro ao converter arquivo.",
-        }
-
-
-def save_localstack(doc, filename):
+def save_localstack(file_md: io.BytesIO, filename):
 
     try:
+        file_md.seek(0)
 
-        s3.put_object(
+        s3.put_fileobject(
             Bucket=BUCKET_NAME,
             Key= filename,
-            Body=doc
+            Body=file_md
         )
+
+        return{
+            "message": "Sucesso ao salvar arquivo no localstack.",
+        }
 
     except:
         return{

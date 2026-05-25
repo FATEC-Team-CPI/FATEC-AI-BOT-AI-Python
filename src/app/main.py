@@ -3,7 +3,8 @@ from fastapi import FastAPI, UploadFile, File
 from app.config import s3, BUCKET_NAME
 from docling.document_converter import DocumentConverter
 from pathlib import Path
-from app.services import read_file, docling_convert, save_localstack
+from app.services import read_file, docling_convert, save_localstack, printa
+import os
 
 
 app = FastAPI(title="IABotAgent FATEC API")
@@ -30,13 +31,15 @@ async def upload(file: UploadFile = File(...)):
             }
         
 
-        doc, filename = docling_convert(content)
+        file_md, filename = docling_convert(file)
+
+        #printa(file_md)
 
         return{
-                "message":  ""+str(doc)+" "+str(filename)+""
+                "message": ""+str(filename)+""
             }
 
-        # save_localstack(doc, filename)
+        # save_localstack(file_md, filename)
 
         
 
