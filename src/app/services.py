@@ -2,32 +2,24 @@ from fastapi import UploadFile, File
 from app.config import s3, BUCKET_NAME
 from docling.document_converter import DocumentConverter
 from pathlib import Path
-import os
 
 
 async def read_file(file: UploadFile):
     
-    allowTypeDocument = [".pdf",".txt"]
-
+    allowTypeDocument = ["application/pdf", "text/plain"]
+    
     try:
-        content = await file.read()
-
-        if(file.suffix not in allowTypeDocument):
-            return{
-                "message": "Erro ao ler arquivo, o formato do arquivo não é compatível.",
-            }
+        if file.content_type not in allowTypeDocument:
+            return False
         
-        if(os.path.getsize(content) > 31457280):
-            return{
-                "message": "Erro ao ler arquivo pois ele é maior que 30 MB.",
-            }
-
-        return content
+        if file.size > 31457280:
+            # 32 MB
+            return False
         
+        return True
+
     except:
-        return{
-            "message": "Erro ao ler arquivo, verifique se o formato do arquivo é compatível.",
-        }
+        return False
         
     
 

@@ -5,6 +5,7 @@ from docling.document_converter import DocumentConverter
 from pathlib import Path
 from app.services import read_file, docling_convert, save_localstack
 
+
 app = FastAPI(title="IABotAgent FATEC API")
 
 
@@ -13,20 +14,31 @@ def home():
     return {"status": "ok"}
 
 @app.post("/teste")
-async def teste(file: UploadFile = File(...)):
-    return {"message": file.suffix}
+def teste(file: UploadFile = File(...)):
+    return {"message": file.content_type}
 
-@app.post("/upload-documentos")
+@app.post("/upload-documento")
 async def upload(file: UploadFile = File(...)):
 
     try:
-        content = read_file(file)
+ 
+        content = await read_file(file)
+
+        if (content == False):
+            return{
+                "message":  "erro"
+            }
+        
+
         doc, filename = docling_convert(content)
-        save_localstack(doc, filename)
 
         return{
-            "message":  doc.filename + "salvo com sucesso",
-        }
+                "message":  ""+str(doc)+" "+str(filename)+""
+            }
+
+        # save_localstack(doc, filename)
+
+        
 
     except OSError:
         return{
@@ -35,9 +47,9 @@ async def upload(file: UploadFile = File(...)):
 
 
 
-@app.get("/listar-documentos")
-def listar():
-    dados = db.get()
-    arquivos = list({m['source'] for m in dados['metadatas']}) if dados['metadatas'] else []
-    return {"documentos": arquivos}
+# @app.get("/listar-documentos")
+# def listar():
+#     dados = db.get()
+#     arquivos = list({m['source'] for m in dados['metadatas']}) if dados['metadatas'] else []
+#     return {"documentos": arquivos}
 
