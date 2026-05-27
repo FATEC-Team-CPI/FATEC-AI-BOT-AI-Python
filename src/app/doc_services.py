@@ -5,6 +5,14 @@ from pathlib import Path
 import io
 import boto3
 
+"""
+Serviços de coleta, formatação e armazenamento dos documentos
+    get documento
+    docling
+    banco vetorial
+"""
+
+
 s3 = boto3.client(
     "s3",
     endpoint_url="http://localhost:4566",  
@@ -53,24 +61,10 @@ def printa(file_md: io.BytesIO):
     print(file_md.read().decode("utf-8"))
 
 
-def save_localstack(file_md: io.BytesIO, filename):
+def search_localstack(file_md: io.BytesIO, filename):
 
-    try:
-        file_md.seek(0)
-
-        s3.put_fileobject(
-            Bucket=BUCKET_NAME,
-            Key= filename,
-            Body=file_md
-        )
-
-        return{
-            "message": "Sucesso ao salvar arquivo no localstack.",
-        }
-
-    except:
-        return{
-            "message": "Erro ao salvar arquivo no localstack.",
-        }
+    return{
+        "message": "Erro ao salvar arquivo no localstack.",
+    }
 
 
